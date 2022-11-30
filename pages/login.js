@@ -22,7 +22,7 @@ import {
 import { BiIdCard, BiLockAlt, BiShow, BiHide } from "react-icons/bi";
 import { useRouter } from "next/router";
 import { AuthContext } from "../utils/AuthContext";
-import backend from "../api/backend";
+import axios from "axios";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,28 +45,30 @@ const Login = () => {
     const user = {
       nim,
       password,
-    }
+    };
 
     handleLogin(user);
   };
 
   const handleLogin = async (user) => {
     try {
-      const res = await backend.post('auth/login', user, {
+      const res = await axios.post("http://localhost:5000/auth/login", user, {
         validateStatus: false,
+        withCredentials: true,
+        credentials: "include",
       });
 
       if (res.status !== 200) {
         alert(res.data.message);
         return;
       }
+      setToken(res.data.data.token);
 
-      setToken(res.data.token);
-      router.push('/');
+      router.push("/");
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <Flex

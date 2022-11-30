@@ -17,6 +17,8 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
+import axios from "axios";
+
 import Navbar from "../components/navbar";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../utils/AuthContext";
@@ -31,8 +33,10 @@ export default function Home() {
 
   const getAllMahasiswa = async () => {
     try {
-      const res = await backend.get("/mahasiswa");
-      setMahasiswas(res.data.mahasiswa);
+      const res = await axios.get("http://localhost:5000/mahasiswa");
+      console.log(token);
+      // console.log(res.data.data);
+      setMahasiswas(res.data.data);
     } catch (error) {
       console.log(error);
     }
@@ -40,19 +44,19 @@ export default function Home() {
 
   const getUserByToken = async () => {
     try {
-      const res = await backend.get("/mahasiswa/profile", {
+      const res = await axios.get("http://localhost:5000/mahasiswa/profile", {
         headers: {
           token,
           validateStatus: false,
         },
       });
-
+      console.log(res.data);
       if (res.status !== 200) {
         alert(res.data.message);
         return;
       }
-
-      return setUser(res.data.mahasiswa);
+      // console.log(res.data);
+      return setUser(res.data.data);
     } catch (error) {
       console.log(error);
     }
@@ -109,7 +113,7 @@ export default function Home() {
                     <Td>{mahasiswa.nim}</Td>
                     <Td>{mahasiswa.nama}</Td>
                     <Td>{mahasiswa.angkatan}</Td>
-                    <Td>{mahasiswa.prodi.nama}</Td>
+                    <Td>{mahasiswa.prodi[0].nama}</Td>
                     <Td>
                       <Button
                         size="sm"

@@ -24,6 +24,7 @@ import { MdArrowDropDown } from "react-icons/md";
 import backend from "../../api/backend";
 import Navbar from "../../components/navbar";
 import { AuthContext } from "../../utils/AuthContext";
+import axios from "axios";
 
 const Detail = () => {
   const [mahasiswa, setMahasiswa] = useState([]);
@@ -35,10 +36,11 @@ const Detail = () => {
 
   const getMahasiswa = async (nim) => {
     try {
-      const res = await backend.get(`/mahasiswa/${nim}`);
-
-      console.log(res.data.mahasiswa.matakuliah);
-      setMahasiswa(res.data.mahasiswa);
+      const res = await axios.get(
+        `http://localhost:5000/mahasiswa/${router.query.id}`
+      );
+      console.log(res.data.data);
+      setMahasiswa(res.data.data[0]);
     } catch (error) {
       console.log(error);
     }
@@ -46,47 +48,46 @@ const Detail = () => {
 
   const getMataKuliahList = async () => {
     try {
-      const res = await backend.get(`/matakuliah`);
-
-      console.log(res.data.matakuliah);
-      setMatakuliahList(res.data.matakuliah);
+      const res = await axios.get(`http://localhost:5000/matakuliah`);
+      console.log(res.data.data);
+      setMatakuliahList(res.data.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getUserByToken = async () => {
-    try {
-      const res = await backend.get("/mahasiswa/profile", {
-        headers: {
-          token,
-          validateStatus: false,
-        },
-      });
+  // const getUserByToken = async () => {
+  //   try {
+  //     const res = await backend.get("/mahasiswa/profile", {
+  //       headers: {
+  //         token,
+  //         validateStatus: false,
+  //       },
+  //     });
 
-      if (res.status !== 200) {
-        alert(res.data.message);
-        return;
-      }
+  //     if (res.status !== 200) {
+  //       alert(res.data.message);
+  //       return;
+  //     }
 
-      return setUser(res.data.mahasiswa);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     return setUser(res.data.mahasiswa);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const addMataKuliah = async (e) => {
     e.preventDefault();
     try {
-      const res = await backend.post(
-        `/mahasiswa/${mahasiswa.nim}/matakuliah/${matakuliahId}`,
+      const res = await axios.post(
+        `http://localhost:5000/mahasiswa/${mahasiswa.nim}/matakuliah/${matakuliahId}`,
         {},
         {
           headers: {
             token,
             validateStatus: false,
           },
-        },
+        }
       );
 
       if (res.status !== 200) {
@@ -104,15 +105,15 @@ const Detail = () => {
 
   const deleteMataKuliah = async (matakuliahId, nim) => {
     try {
-      const res = await backend.put(
-        `/mahasiswa/${nim}/matakuliah/${matakuliahId}`,
+      const res = await axios.put(
+        `http://localhost:5000/mahasiswa/${nim}/matakuliah/${matakuliahId}`,
         {},
         {
           headers: {
             token,
             validateStatus: false,
           },
-        },
+        }
       );
 
       if (res.status !== 200) {
@@ -136,8 +137,8 @@ const Detail = () => {
   useEffect(() => {
     getMahasiswa(router.query.id);
     getMataKuliahList();
-    getUserByToken();
-  }, [token]);
+    // getUserByToken();
+  }, []);
 
   return (
     <Box
@@ -190,8 +191,8 @@ const Detail = () => {
                 >
                   {matakuliahList &&
                     matakuliahList.map((mkList) => (
-                      <option value={mkList.id} key={mkList.id}>
-                        {mkList.id + " " + mkList.nama}
+                      <option value={mkList._id} key={mkList._id}>
+                        {mkList._id + " " + mkList.nama}
                       </option>
                     ))}
                 </Select>
@@ -221,15 +222,15 @@ const Detail = () => {
 
                 <Tbody>
                   {mahasiswa.matakuliah?.map((mk) => (
-                    <Tr key={mk.id}>
-                      <Td>{mk.id}</Td>
+                    <Tr key={mk._id}>
+                      <Td>{mk._id}</Td>
                       <Td>{mk.nama}</Td>
                       <Td>
                         <Button
                           size="sm"
                           colorScheme="red"
                           onClick={() =>
-                            deleteMataKuliah(mk.id, router.query.id)
+                            deleteMataKuliah(mk._id, router.query.id)
                           }
                         >
                           Delete

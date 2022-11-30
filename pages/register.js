@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import backend from '../api/backend';
+import backend from "../api/backend";
 
 import {
   Flex,
@@ -23,6 +23,7 @@ import { BiIdCard, BiLockAlt, BiShow, BiHide, BiUser } from "react-icons/bi";
 
 import { MdArrowDropDown } from "react-icons/md";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,10 +40,14 @@ const Register = () => {
 
   const registerUser = async (values) => {
     try {
-      const res = await backend.post("/auth/register", values, {
-        validateStatus: false,
-      });
-
+      const res = await axios.post(
+        "http://localhost:5000/auth/register",
+        values,
+        {
+          validateStatus: false,
+        }
+      );
+      console.log(res.data);
       return res.data;
     } catch (error) {
       console.log(error);
@@ -51,13 +56,13 @@ const Register = () => {
 
   const getProdi = async () => {
     try {
-      const res = await backend.get("/prodi");
+      const res = await axios.get("http://localhost:5000/prodi");
 
       setProdiList(res.data.prodi);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -67,15 +72,15 @@ const Register = () => {
       angkatan,
       prodiId: prodi,
       password,
-    }
+    };
 
     registerUser(values);
-    router.push('/login');
+    router.push("/login");
   };
 
   useEffect(() => {
     getProdi();
-  }, [])
+  }, []);
 
   return (
     <Flex
@@ -131,11 +136,19 @@ const Register = () => {
                     placeholder="Prodi"
                     icon={<MdArrowDropDown />}
                     value={prodi}
-                    onChange={(e) => setProdi(e.target.value)}
+                    onChange={(e) => {
+                      setProdi(e.target.value);
+                      console.log(e.target.value);
+                    }}
                   >
-                    { prodiList && prodiList.map((prodiItem) => {
-                      return <option value={prodiItem.id} key={prodiItem.id}>{prodiItem.nama}</option>
-                    }) }
+                    {prodiList &&
+                      prodiList.map((prodiItem) => {
+                        return (
+                          <option value={prodiItem._id} key={prodiItem._id}>
+                            {prodiItem.nama}
+                          </option>
+                        );
+                      })}
                   </Select>
                 </InputGroup>
               </FormControl>
